@@ -24,7 +24,7 @@ Every action is reachable by **both** keyboard and mouse — the two share one d
 | Key | View | Description |
 |-----|------|-------------|
 | `1` | Tree | Split-pane: expandable tree (left) + labeled bar chart (right) |
-| `2` | Top-N | Largest files (default top 100) with labeled size chart |
+| `2` | Top-N | Full-width **selectable** table of the largest files (top 100): `#`, size, % of disk, and full path. Select with keyboard or mouse; **`d`** deletes and **`f`** reveals the selected file. The selected file's complete path is shown in the status bar. |
 | `3` | Extensions | Breakdown by file extension with labeled pie-style legend |
 | `4` | Volumes | Mounted disks with usage bars; **Enter** on a row starts scan of that mount |
 | `Tab` / `Shift+Tab` | — | Cycle views forward / backward |
@@ -80,7 +80,7 @@ Filter includes the scan root when its name matches; cancel clears the filter ba
 | `f` | Reveal in Finder (`open -R`) |
 | `e` | Export report (text or CSV; optional redacted mode) |
 
-Deletes are **permanent** (not moved to Trash). Protected paths (system prefixes, scan root, home, ancestors) are blocked.
+Deletes are **permanent** (not moved to Trash). Protected paths (system prefixes, scan root, home, ancestors) are blocked. Delete can be triggered from the **tree** or the **Top-N files** view (whichever item is selected). Deletion runs on a background worker with a **live progress panel** (bar, `removed / total items`, elapsed, current path) so the UI stays responsive on large folders; press **`c`** to cancel an in-progress delete (already-removed items stay removed).
 
 ## Navigation
 
@@ -91,7 +91,7 @@ Deletes are **permanent** (not moved to Trash). Protected paths (system prefixes
 | `PgUp`/`PgDn` | Scroll one page |
 | `Home`/`End` | Jump to first / last row |
 | `Enter` | Toggle expand/collapse (tree view) |
-| `t` | Color theme picker |
+| `t` | Color theme picker (11 themes: classic, nord, gruvbox, solarized, dracula, tokyo-night, catppuccin, one-dark, monokai, monochrome, light) |
 | `?` | Help overlay |
 | `q` | Quit |
 

@@ -13,27 +13,54 @@ Default path: `/` (macOS). Use `~` explicitly for home.
 
 ## `app.rs`
 
-ratatui TUI application.
+ratatui TUI orchestrator (~950 lines). Owns `App` state, the event loop, scan/delete session lifecycle, and `dispatch_action`. Rendering, modals, views, and input live under `ui/`.
 
 | Symbol | Role |
 |--------|------|
-| `App` | Main state: views, modals, scan lifecycle, input handling, menu/toolbar/mouse hit regions |
-| `ViewMode` | Tree, TopFiles, Extensions, Volumes |
+| `App` | Main state: views, `Option<Modal>`, `Option<ActiveJob>`, menu/toolbar/mouse hit regions |
 | `App::dispatch_action(Action)` | Single implementation point for every user intent (keyboard, mouse, menu, toolbar) |
-| `handle_key` / `handle_mouse` / `handle_left_click` | Translate input events into `Action`s and hit-test the menu/toolbar/table |
+| `poll_active_job()` | Poll scan bridge or delete progress each loop iteration |
+| `cancel_active_job()` | Cancel whichever background job is running |
 | `run_app(start_path)` | Enables raw mode + mouse capture, runs event loop |
+
+Key behaviors: filter precompute, live tree merge via `TreeState` + `tree_state.dirty` refresh (~200ms), `ScanBridge` message coalescing, multi-line scan/delete progress panels, export overwrite/redact.
+
+## `session.rs`
+
+| Symbol | Role |
+|--------|------|
+| `ActiveJob` | `Scan { bridge, cancel, … }` or `Delete { progress, target, … }` — at most one background job at a time |
+
+## `ui/modal.rs` / `ui/views.rs` / `ui/render.rs` / `ui/input.rs`
+
+| Module | Role |
+|--------|------|
+| `ui/modal.rs` | `Modal`, `PendingAction`, `handle_modal_key`, `render_modal`, `execute_pending_action` |
+| `ui/views.rs` | `TreeRow`, view builders (`build_tree_view`, …), navigation (`scroll_main`, `get_selected_node`, …) |
+| `ui/render.rs` | `render`, menu/toolbar/table/chart/progress panels; width-adaptive tree columns (`Name` via `Fill`) |
+| `ui/input.rs` | `handle_key` / `handle_mouse` / `handle_left_click`, `delete_selected`, `TerminalGuard` |
 
 Modals: Help, Confirm, TypedConfirm, PathInput, Export, ScanErrors. FDA uses a non-modal top banner. The top two rows are the clickable menu bar and toolbar; an open dropdown floats above content and below modals.
 
-Key behaviors: filter precompute, live tree merge via `TreeState` + `tree_state.dirty` refresh (~200ms), `ScanBridge` message coalescing, multi-line scan progress panel, delete with TOCTOU guards, export overwrite/redact, mouse click/scroll, `PageUp`/`PageDown`/`Home`/`End` navigation.
+The Tree view splits the content area 64/36 between the table and the chart panel. The **Top-N files** view also renders through `render_table` (its own `#`/`Size`/`%Disk`/`Path` columns, `Path` via `Fill`) so it is a full-width selectable table sharing the tree's `table_state`, click handling, and `get_selected_node` — delete/reveal work there too.
 
-`render_table` builds **width-adaptive** columns for the tree view: the `Name` column always takes the leftover width via `Constraint::Fill` (after reserving a proportional minimum) so it can never collapse to zero, and secondary metadata columns are admitted in priority order only while they fit the pane. The Tree view splits the content area 64/36 between the table and the chart panel.
+Delete runs on a background worker (`delete.rs`); `poll_active_job()` repaints the delete progress panel and, on completion, reports the result and refreshes the affected subtree. `Action::Cancel` (`c`) cancels an active delete or scan.
+
+## `delete.rs`
+
+| Symbol | Role |
+|--------|------|
+| `DeleteProgress` | Shared progress for a background delete: atomic item count, `total_items` estimate, done/cancel flags, current path, error slot |
+| `run_delete()` | Worker entry point: recursively delete a target, updating `DeleteProgress`, then flag completion |
+
+Recursion uses `symlink_metadata` (never follows links — a symlinked directory is removed as a single entry), removes files then their containing directory (post-order), and checks the cancel flag between entries.
 
 ## `menu.rs`
 
 | Symbol | Role |
 |--------|------|
-| `Action` | Closed enum of every user intent; keyboard/mouse/menu/toolbar all map to it |
+| `ViewMode` | Tree, TopFiles, Extensions, Volumes |
+| `Action` | Closed enum of every user intent; keyboard/mouse/menu/toolbar all map to it (`Cancel` stops scan or delete) |
 | `MENUS` / `Menu` / `MenuItem` | Static menu-bar dropdown definitions (each item carries its key hint) |
 | `TOOLBAR` / `ToolButton` | Static toolbar button definitions |
 | `key_to_action()` | Pure key-event → `Action` mapping |
@@ -128,6 +155,8 @@ Re-exports chart functions from `charts.rs`.
 | Symbol | Role |
 |--------|------|
 | `normalize_path()` | Canonical absolute path (`realpath`) — used for security boundary checks only |
+| `expand_user_path()` | Expand `~` and make relative paths absolute (no canonicalize) — shared by export and modals |
+| `dirs_home()` | `$HOME` or `/` fallback |
 | `lexical_key()` | Syscall-free comparison key (expand `~`, absolutize, resolve `.`/`..`, collapse `/private` firmlink); used for tree-node identity on the live-merge hot path |
 | `is_under_scan_root()` | Symlink-safe boundary check (canonicalizes both paths) |
 | `is_under_root_lexical()` | Pure lexical containment check (no syscalls) for the scan hot path |

@@ -117,7 +117,19 @@ impl Default for Theme {
 
 /// All built-in themes, in cycle order. `--theme` and the runtime cycle key
 /// resolve against this list.
-pub const THEMES: &[Theme] = &[CLASSIC, NORD, GRUVBOX, SOLARIZED, DRACULA, MONOCHROME];
+pub const THEMES: &[Theme] = &[
+    CLASSIC,
+    NORD,
+    GRUVBOX,
+    SOLARIZED,
+    DRACULA,
+    TOKYO_NIGHT,
+    CATPPUCCIN,
+    ONE_DARK,
+    MONOKAI,
+    MONOCHROME,
+    LIGHT,
+];
 
 /// The original look: terminal-default borders with ANSI accent colors.
 pub const CLASSIC: Theme = Theme {
@@ -179,7 +191,10 @@ pub const SOLARIZED: Theme = Theme {
 pub const DRACULA: Theme = Theme {
     name: "dracula",
     border: Color::Rgb(0x62, 0x72, 0xA4),
-    header: Color::Rgb(0xBD, 0x93, 0xF9),
+    // Headers use the near-white Dracula foreground rather than the purple
+    // accent: purple-on-dark headers read poorly. Purple stays as the filter
+    // accent below, where it sits behind dark text.
+    header: Color::Rgb(0xF8, 0xF8, 0xF2),
     selection_bg: Color::Rgb(0x44, 0x47, 0x5A),
     selection_fg: Color::Rgb(0xF8, 0xF8, 0xF2),
     filter_bg: Color::Rgb(0xBD, 0x93, 0xF9),
@@ -187,6 +202,76 @@ pub const DRACULA: Theme = Theme {
     accent: Color::Rgb(0x8B, 0xE9, 0xFD),
     danger: Color::Rgb(0xFF, 0x55, 0x55),
     warning: Color::Rgb(0xF1, 0xFA, 0x8C),
+};
+
+/// Tokyo Night — deep indigo with bright blue accents. <https://github.com/enkia/tokyo-night-vscode-theme>
+pub const TOKYO_NIGHT: Theme = Theme {
+    name: "tokyo-night",
+    border: Color::Rgb(0x56, 0x5F, 0x89),
+    header: Color::Rgb(0x7A, 0xA2, 0xF7),
+    selection_bg: Color::Rgb(0x28, 0x34, 0x57),
+    selection_fg: Color::Rgb(0xC0, 0xCA, 0xF5),
+    filter_bg: Color::Rgb(0x7A, 0xA2, 0xF7),
+    filter_fg: Color::Rgb(0x1A, 0x1B, 0x26),
+    accent: Color::Rgb(0x7D, 0xCF, 0xFF),
+    danger: Color::Rgb(0xF7, 0x76, 0x8E),
+    warning: Color::Rgb(0xE0, 0xAF, 0x68),
+};
+
+/// Catppuccin Mocha — soft pastel on warm dark. <https://catppuccin.com/>
+pub const CATPPUCCIN: Theme = Theme {
+    name: "catppuccin",
+    border: Color::Rgb(0x6C, 0x70, 0x86),
+    header: Color::Rgb(0x89, 0xB4, 0xFA),
+    selection_bg: Color::Rgb(0x31, 0x32, 0x44),
+    selection_fg: Color::Rgb(0xCD, 0xD6, 0xF4),
+    filter_bg: Color::Rgb(0x89, 0xB4, 0xFA),
+    filter_fg: Color::Rgb(0x1E, 0x1E, 0x2E),
+    accent: Color::Rgb(0x89, 0xDC, 0xEB),
+    danger: Color::Rgb(0xF3, 0x8B, 0xA8),
+    warning: Color::Rgb(0xF9, 0xE2, 0xAF),
+};
+
+/// One Dark — the Atom classic. <https://github.com/atom/one-dark-syntax>
+pub const ONE_DARK: Theme = Theme {
+    name: "one-dark",
+    border: Color::Rgb(0x4B, 0x52, 0x63),
+    header: Color::Rgb(0x61, 0xAF, 0xEF),
+    selection_bg: Color::Rgb(0x3E, 0x44, 0x51),
+    selection_fg: Color::Rgb(0xFF, 0xFF, 0xFF),
+    filter_bg: Color::Rgb(0x61, 0xAF, 0xEF),
+    filter_fg: Color::Rgb(0x28, 0x2C, 0x34),
+    accent: Color::Rgb(0x56, 0xB6, 0xC2),
+    danger: Color::Rgb(0xE0, 0x6C, 0x75),
+    warning: Color::Rgb(0xE5, 0xC0, 0x7B),
+};
+
+/// Monokai — high-energy neon on espresso. <https://monokai.pro/>
+pub const MONOKAI: Theme = Theme {
+    name: "monokai",
+    border: Color::Rgb(0x75, 0x71, 0x5E),
+    header: Color::Rgb(0xA6, 0xE2, 0x2E),
+    selection_bg: Color::Rgb(0x49, 0x48, 0x3E),
+    selection_fg: Color::Rgb(0xF8, 0xF8, 0xF2),
+    filter_bg: Color::Rgb(0x66, 0xD9, 0xEF),
+    filter_fg: Color::Rgb(0x27, 0x28, 0x22),
+    accent: Color::Rgb(0x66, 0xD9, 0xEF),
+    danger: Color::Rgb(0xF9, 0x26, 0x72),
+    warning: Color::Rgb(0xE6, 0xDB, 0x74),
+};
+
+/// Light — for light-background terminals (GitHub-style palette).
+pub const LIGHT: Theme = Theme {
+    name: "light",
+    border: Color::Rgb(0xAF, 0xB8, 0xC1),
+    header: Color::Rgb(0x09, 0x69, 0xDA),
+    selection_bg: Color::Rgb(0x09, 0x69, 0xDA),
+    selection_fg: Color::Rgb(0xFF, 0xFF, 0xFF),
+    filter_bg: Color::Rgb(0xDD, 0xF4, 0xFF),
+    filter_fg: Color::Rgb(0x0A, 0x30, 0x69),
+    accent: Color::Rgb(0x09, 0x69, 0xDA),
+    danger: Color::Rgb(0xCF, 0x22, 0x2E),
+    warning: Color::Rgb(0x9A, 0x67, 0x00),
 };
 
 /// Monochrome — grayscale only, for low-color terminals and minimal setups.

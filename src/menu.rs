@@ -7,9 +7,16 @@
 //! The layout helpers here are pure functions returning click rectangles, shared
 //! by both rendering and hit-testing so the two can never drift apart.
 
-use crate::app::ViewMode;
 use crate::models::SortKey;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ViewMode {
+    Tree,
+    TopFiles,
+    Extensions,
+    Volumes,
+}
 
 /// Every discrete thing the user can ask the app to do.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -23,7 +30,7 @@ pub enum Action {
     SetSort(SortKey),
     RescanSelected,
     RescanTree,
-    CancelScan,
+    Cancel,
     GotoPath,
     ToggleSymlinks,
     ToggleHidden,
@@ -191,9 +198,9 @@ pub const MENUS: &[Menu] = &[
                 action: Action::RescanTree,
             },
             MenuItem {
-                label: "Cancel scan",
+                label: "Cancel",
                 key: "c",
-                action: Action::CancelScan,
+                action: Action::Cancel,
             },
             MenuItem {
                 label: "Filter…",
@@ -367,7 +374,7 @@ pub fn key_to_action(key: KeyEvent) -> Option<Action> {
         KeyCode::Char('r') if shift => Some(Action::RescanTree),
         KeyCode::Char('R') => Some(Action::RescanTree),
         KeyCode::Char('r') => Some(Action::RescanSelected),
-        KeyCode::Char('c') => Some(Action::CancelScan),
+        KeyCode::Char('c') => Some(Action::Cancel),
         KeyCode::Char('g') | KeyCode::Char('o') => Some(Action::GotoPath),
         KeyCode::Char('v') => Some(Action::ToggleSymlinks),
         KeyCode::Char('H') => Some(Action::ToggleHidden),

@@ -1,5 +1,5 @@
 use crate::models::ScanNode;
-use crate::paths::is_under_scan_root;
+use crate::paths::{dirs_home, expand_user_path, is_under_scan_root};
 use crate::scanner::format_bytes;
 use crate::util::truncate_chars;
 use chrono::Local;
@@ -39,7 +39,7 @@ pub fn has_sensitive_paths(root: &ScanNode) -> bool {
 }
 
 pub fn is_sensitive_export_path(path: &Path) -> bool {
-    let expanded = expand_user(path);
+    let expanded = expand_user_path(path);
     let home = dirs_home();
     if expanded.starts_with(&home) {
         if let Ok(rel) = expanded.strip_prefix(&home) {
@@ -260,7 +260,7 @@ pub fn save_report(
         fmt
     };
 
-    let expanded = expand_user(path);
+    let expanded = expand_user_path(path);
     if let Some(parent) = expanded.parent() {
         fs::create_dir_all(parent)?;
     }
@@ -280,23 +280,6 @@ pub fn save_report(
 
     fs::write(&expanded, content)?;
     Ok(expanded)
-}
-
-fn expand_user(path: &Path) -> PathBuf {
-    let s = path.to_string_lossy();
-    if let Some(rest) = s.strip_prefix("~/") {
-        dirs_home().join(rest)
-    } else if s == "~" {
-        dirs_home()
-    } else {
-        path.to_path_buf()
-    }
-}
-
-fn dirs_home() -> PathBuf {
-    std::env::var_os("HOME")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from("/"))
 }
 
 #[cfg(test)]

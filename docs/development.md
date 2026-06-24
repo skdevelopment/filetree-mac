@@ -30,7 +30,7 @@ cargo test --test paths_test
 cargo test --lib                 # unit tests, incl. menu/action + headless TUI render tests
 ```
 
-Integration tests live in `tests/*.rs` (scanner, paths, export, FDA, models, CLI, app_logic, platform, scan_bridge, tree_state, progress). Unit tests live in `#[cfg(test)]` modules, including `src/menu.rs` (key→action mapping, row layout) and `src/app.rs` (menu/toolbar/dropdown rendering and click hit-testing via ratatui `TestBackend`).
+Integration tests live in `tests/*.rs` (scanner, paths, export, FDA, models, CLI, app_logic, platform, scan_bridge, tree_state, progress). Unit tests live in `#[cfg(test)]` modules, including `src/menu.rs` (key→action mapping, row layout) and `src/app.rs` (menu/toolbar/dropdown rendering and click hit-testing via ratatui `TestBackend`; UI logic split across `src/ui/`).
 
 ### Scan benchmark
 

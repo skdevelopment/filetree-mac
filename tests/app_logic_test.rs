@@ -1,6 +1,6 @@
 use filetree::app_logic::{
     chart_bar_width, clamp_table_selection, confirm_dialog_executes, export_modal_selection,
-    progress_bar_width, tick_needs_redraw, typed_confirm_executes,
+    tick_needs_redraw, typed_confirm_executes,
 };
 
 #[test]
@@ -28,12 +28,6 @@ fn test_export_modal_selection_cancel_is_none() {
 fn test_chart_bar_width_scales_to_pane() {
     assert!(chart_bar_width(80, 18) >= 4);
     assert!(chart_bar_width(40, 18) < chart_bar_width(120, 18));
-}
-
-#[test]
-fn test_progress_bar_width_scales() {
-    assert!(progress_bar_width(30) >= 10);
-    assert!(progress_bar_width(200) <= 50);
 }
 
 #[test]

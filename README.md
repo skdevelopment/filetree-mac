@@ -88,11 +88,11 @@ filetree --version
 | **Size columns** | Allocated size, actual size, % of parent, % of disk, inline bar |
 | **Sort** | By name, size, allocated, date, extension, owner, percent |
 | **Filter** | Find files/folders by name substring (`/`) |
-| **Multiple views** | Tree, Top-100 files, Extension breakdown (ASCII chart), Volumes |
+| **Multiple views** | Tree, Top-100 files (selectable table with full paths), Extension breakdown (ASCII chart), Volumes |
 | **Drive list** | All mounted volumes with used/free space bars |
 | **Progress** | 6-line scan panel: bytes/items, ETA, current path; brief status bar summary |
 | **Refresh** | Rescan selected folder (`r`) or entire tree (`R`) |
-| **Delete** | Remove selected item with confirmation (`d`) |
+| **Delete** | Remove selected item with confirmation (`d`); live progress panel, cancellable (`c`); works from the tree or Top-100 view |
 | **Reveal in Finder** | Open selected path in Finder (`f`) |
 | **Export** | Save report as `.txt` or `.csv` (`e`) |
 | **Symlinks** | Don't follow symlinks by default; toggle with `v` |
@@ -152,7 +152,7 @@ filetree ~/Library/CloudStorage/GoogleDrive-you@example.com
 | `e` | Export report |
 | `v` | Toggle follow symlinks |
 | `H` | Toggle hidden files |
-| `t` | Color theme picker |
+| `t` | Color theme picker (11 themes) |
 | `?` | Help screen |
 | `q` | Quit |
 
@@ -184,6 +184,8 @@ filetree-mac/
 ├── src/                  # Rust TUI
 │   ├── main.rs
 │   ├── app.rs
+│   ├── session.rs
+│   ├── ui/               (modal, views, render, input)
 │   ├── scanner.rs
 │   └── …
 └── tests/                # cargo test

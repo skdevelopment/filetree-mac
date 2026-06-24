@@ -25,11 +25,6 @@ pub fn chart_bar_width(pane_width: u16, label_reserve: usize) -> usize {
     ((pane_width as usize).saturating_sub(label_reserve + 14)).clamp(4, 40)
 }
 
-/// Scale progress bar fill width to terminal width.
-pub fn progress_bar_width(area_width: u16) -> usize {
-    (area_width as usize).saturating_sub(8).clamp(10, 50)
-}
-
 /// Whether the event loop should redraw on this tick.
 pub fn tick_needs_redraw(
     dirty: bool,

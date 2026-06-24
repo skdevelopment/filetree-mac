@@ -7,6 +7,18 @@ Agents: add entries under **[Unreleased]** for every change; move to a version s
 
 ## [Unreleased]
 
+### Changed
+- **Refactored `src/app.rs` into smaller modules.** The ~3000-line monolith is now split into `session.rs` (`ActiveJob` unifying scan and delete workers), `ui/modal.rs`, `ui/views.rs`, `ui/render.rs`, and `ui/input.rs`. `App` uses `Option<Modal>` (no `Modal::None`) and `active_job: Option<ActiveJob>` instead of separate scan/delete fields. `ViewMode` moved to `menu.rs`; `Action::CancelScan` renamed to `Action::Cancel`. Path helpers `dirs_home` / `expand_user_path` consolidated in `paths.rs`.
+
+### Added
+- **Delete now shows live progress.** Deleting a folder previously called `remove_dir_all` synchronously on the UI thread, freezing the app for seconds on large directories with no feedback. Deletion now runs on a background worker that removes one entry at a time and reports the current path and a running item count; a progress panel (bar, `removed / total items`, elapsed, current path) appears while it runs, the UI stays responsive, and **`c` cancels** a delete in progress. New module `src/delete.rs`.
+- **Top-N files view is now a selectable, deletable table.** It was static, scrolling text with paths truncated to 56 characters. It is now a full-width table (`#`, `Size`, `%Disk`, `Path`) where each file is **selectable by keyboard and mouse**, the **full path** is shown (wide `Path` column plus the selected file's complete path in the status bar), and you can **delete (`d`)** or **reveal (`f`)** the selected file directly from the view.
+- **Five more color themes:** `tokyo-night`, `catppuccin` (Mocha), `one-dark`, `monokai`, and a `light` theme for light-background terminals — 11 built-in themes total, cycled with `t`.
+
+### Fixed
+- **Could not type `h` or `l` when confirming a delete or naming an export.** The typed-delete confirmation and the export filename field both reused the vim-style `h`/`l` keys as button navigation, which swallowed those letters before they reached the text field — so folder names / filenames containing `h` or `l` were impossible to type. Those fields now take all letters; only the arrow keys move between buttons.
+- **Dracula theme: column headers were purple-on-dark and hard to read** — they now use the near-white Dracula foreground. Purple remains the filter-bar accent (behind dark text).
+
 ## [0.2.0] - 2026-06-24
 
 First public release — a free, open-source alternative to TreeSize and DaisyDisk for macOS.

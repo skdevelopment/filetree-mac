@@ -326,16 +326,13 @@ impl ScanNode {
             return Some(self);
         }
         let rel = key.strip_prefix(&self_key).ok()?;
-        let names: Vec<_> = rel
-            .components()
-            .map(|c| c.as_os_str().to_os_string())
-            .collect();
         let mut node = self;
-        for name in &names {
+        for comp in rel.components() {
+            let name = comp.as_os_str();
             let idx = node
                 .children
                 .iter()
-                .position(|c| c.path.file_name() == Some(name.as_os_str()))?;
+                .position(|c| c.path.file_name() == Some(name))?;
             node = &mut node.children[idx];
         }
         Some(node)

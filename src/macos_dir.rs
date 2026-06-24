@@ -30,7 +30,7 @@ mod bulk {
     const ATTR_FILE_ALLOCSIZE: u32 = 0x0000_0004;
 
     const VNODE_DIR: u32 = 1;
-    const VNODE_REG: u32 = 2;
+    const _VNODE_REG: u32 = 2;
     const VNODE_LNK: u32 = 3;
 
     #[repr(C)]

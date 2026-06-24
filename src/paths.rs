@@ -108,7 +108,18 @@ fn expand_user(path: &Path) -> PathBuf {
     path.to_path_buf()
 }
 
-fn dirs_home() -> PathBuf {
+pub fn expand_user_path(path: &Path) -> PathBuf {
+    let expanded = expand_user(path);
+    if expanded.is_absolute() {
+        expanded
+    } else {
+        std::env::current_dir()
+            .unwrap_or_else(|_| PathBuf::from("/"))
+            .join(expanded)
+    }
+}
+
+pub fn dirs_home() -> PathBuf {
     std::env::var_os("HOME")
         .map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from("/"))

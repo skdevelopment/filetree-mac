@@ -29,8 +29,11 @@ filetree is a **local, single-user** tool with no network service. Risk is conce
 ## Delete policy
 
 - Confirmation dialog; typed confirmation for paths ≥ 1 GB
-- No Trash integration — `std::fs::remove_file` / `std::fs::remove_dir_all`
-- Disabled while `scan_in_progress` (background scan worker active)
+- No Trash integration — permanent removal
+- Runs on a background worker (`delete.rs`) that walks the tree itself (files first, then the directory, post-order) instead of one opaque `remove_dir_all`, so progress can be shown and the delete cancelled (`c`). Recursion uses `symlink_metadata` and never follows a symlink, so a symlinked directory inside the target is removed as a single entry — deletion can never escape the target tree
+- The target is still validated up front by `safe_delete_target()` (TOCTOU re-check, symlink reject, scan-root containment) before the worker starts; cancelling leaves already-removed entries removed
+- Disabled while `scan_in_progress`, and a new scan/delete is refused while a delete is in progress
+- Deletable from the tree **and** the Top-N files view (the selected node in either)
 - Post-delete subtree refresh uses background `start_rescan`, not a blocking rescan on the UI thread
 - Reveal in Finder uses same boundary checks as delete
 

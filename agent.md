@@ -88,8 +88,10 @@ filetree-mac/
 ├── docs/                 ← agent & contributor reference
 ├── src/                  ← canonical Rust application
 │   ├── main.rs           ← CLI entry (clap)
-│   ├── app.rs            ← ratatui TUI (keyboard + mouse, menu/toolbar, action dispatch)
-│   ├── menu.rs           ← Action enum, menu/toolbar defs, key→action, hit-test helpers
+│   ├── app.rs            ← TUI orchestrator (event loop, session lifecycle, dispatch_action)
+│   ├── session.rs        ← ActiveJob (unified scan/delete background worker)
+│   ├── ui/               ← modal, views, render, input (TUI presentation)
+│   ├── menu.rs           ← ViewMode, Action enum, menu/toolbar defs, key→action
 │   ├── progress.rs       ← scan progress panel, rates, ETA helpers
 │   ├── scanner.rs        ← parallel directory scanner (rayon work-stealing pool)
 │   ├── models.rs         ← ScanNode, progress, volumes, extensions

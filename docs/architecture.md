@@ -6,11 +6,14 @@ filetree is a single-process macOS terminal application:
 
 ```
 CLI (main.rs / clap)
-    └── ratatui App (app.rs)
+    └── ratatui App (app.rs) — event loop, session lifecycle, dispatch_action
+            ├── ui/ (modal, views, render, input) — TUI presentation + input routing
             ├── Menu/toolbar + Action dispatch (menu.rs) — keyboard + mouse → one action vocabulary
+            ├── ActiveJob (session.rs)         — unified scan or delete background worker
             ├── ScanBridge (scan_bridge.rs)    — coalesce worker messages per frame
             ├── TreeState (tree_state.rs)      — live merge + orphan buffer
             ├── DirectoryScanner (scanner.rs)  — background scan thread + rayon work-stealing pool
+            ├── Delete worker (delete.rs)      — cancellable recursive delete + progress
             ├── FDA check (fda.rs)             — startup banner (non-blocking)
             ├── Export (export.rs)             — on-demand reports
             └── Path safety (paths.rs)         — delete / reveal guards
@@ -57,10 +60,11 @@ being processed one per 100ms tick.
 
 ## Threading model
 
-- **Main thread** — crossterm event loop (keyboard + mouse), ratatui render, `scan_in_progress` flag.
+- **Main thread** — crossterm event loop (keyboard + mouse), ratatui render, `Option<ActiveJob>` (at most one background job).
 - **Scan thread** — `std::thread::spawn` runs `DirectoryScanner::scan()` / `rescan_subtree_in_tree()`, which in turn drives a rayon pool.
 - **Rayon worker pool** — sized to `max_workers` (≈2× cores, capped at 32); workers steal directory subtrees via `par_iter_mut`. `ScanProgress` updates only when a worker wins the CAS emit slot; per-file/dir counters are atomics; `seen_paths` is locked only when following symlinks (cycle detection).
-- **Cancel** — Shared `Arc<AtomicBool>` between UI and scanner; checked at the top of each `scan_directory`.
+- **Cancel** — `Action::Cancel` (`c`) calls `cancel_active_job()`: shared `Arc<AtomicBool>` for scans (checked at the top of each `scan_directory`), or `DeleteProgress::request_cancel()` for deletes.
+- **Delete thread** — `std::thread::spawn` runs `delete::run_delete()`, recursively removing the target one entry at a time and publishing `Arc<DeleteProgress>`. `poll_active_job()` repaints the progress panel and, on completion, refreshes the affected subtree — mirroring the scan pipeline so a large delete never blocks the UI.
 
 ## External dependencies
 
