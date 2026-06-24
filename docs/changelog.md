@@ -10,6 +10,7 @@ Agents: add entries under **[Unreleased]** for every change; move to a version s
 ## [0.3.0] - 2026-06-24
 
 ### Changed
+- **Menu bar and toolbar text readable on every theme.** Several palettes (Tokyo Night, Catppuccin, One Dark, Nord) painted menu/toolbar labels with a foreground that matched the bar background — invisible text. Chrome rows now use `filter_fg` on `filter_bg` for inactive buttons and a distinct `selection_bg` highlight for the active view / open menu; Tokyo Night, Catppuccin, and One Dark table-header colors were retuned accordingly.
 - **Refactored `src/app.rs` into smaller modules.** The ~3000-line monolith is now split into `session.rs` (`ActiveJob` unifying scan and delete workers), `ui/modal.rs`, `ui/views.rs`, `ui/render.rs`, and `ui/input.rs`. `App` uses `Option<Modal>` (no `Modal::None`) and `active_job: Option<ActiveJob>` instead of separate scan/delete fields. `ViewMode` moved to `menu.rs`; `Action::CancelScan` renamed to `Action::Cancel`. Path helpers `dirs_home` / `expand_user_path` consolidated in `paths.rs`.
 
 ### Added

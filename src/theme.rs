@@ -66,6 +66,29 @@ impl Theme {
         Style::default().bg(self.filter_bg).fg(self.filter_fg)
     }
 
+    /// Background + default foreground for the menu bar and toolbar rows.
+    pub fn chrome_bar_style(&self) -> Style {
+        self.filter_style()
+    }
+
+    /// A clickable label on the menu bar or toolbar.
+    ///
+    /// Inactive buttons use [`filter_fg`] (paired with [`filter_bg`]); active
+    /// buttons use the selection palette so the highlight is always distinct
+    /// from the bar background.
+    pub fn chrome_button_style(&self, active: bool) -> Style {
+        if active {
+            Style::default()
+                .bg(self.selection_bg)
+                .fg(self.selection_fg)
+                .add_modifier(Modifier::BOLD)
+        } else {
+            Style::default()
+                .fg(self.filter_fg)
+                .add_modifier(Modifier::BOLD)
+        }
+    }
+
     /// Style for informational accents (dialog borders).
     pub fn accent_style(&self) -> Style {
         Style::default().fg(self.accent)
@@ -150,7 +173,8 @@ pub const NORD: Theme = Theme {
     name: "nord",
     border: Color::Rgb(0x81, 0xA1, 0xC1),
     header: Color::Rgb(0x88, 0xC0, 0xD0),
-    selection_bg: Color::Rgb(0x5E, 0x81, 0xAC),
+    // Darker than `filter_bg` so the active chrome button reads on the bar.
+    selection_bg: Color::Rgb(0x4C, 0x56, 0x6A),
     selection_fg: Color::Rgb(0xEC, 0xEF, 0xF4),
     filter_bg: Color::Rgb(0x5E, 0x81, 0xAC),
     filter_fg: Color::Rgb(0xEC, 0xEF, 0xF4),
@@ -208,7 +232,7 @@ pub const DRACULA: Theme = Theme {
 pub const TOKYO_NIGHT: Theme = Theme {
     name: "tokyo-night",
     border: Color::Rgb(0x56, 0x5F, 0x89),
-    header: Color::Rgb(0x7A, 0xA2, 0xF7),
+    header: Color::Rgb(0xC0, 0xCA, 0xF5),
     selection_bg: Color::Rgb(0x28, 0x34, 0x57),
     selection_fg: Color::Rgb(0xC0, 0xCA, 0xF5),
     filter_bg: Color::Rgb(0x7A, 0xA2, 0xF7),
@@ -222,7 +246,7 @@ pub const TOKYO_NIGHT: Theme = Theme {
 pub const CATPPUCCIN: Theme = Theme {
     name: "catppuccin",
     border: Color::Rgb(0x6C, 0x70, 0x86),
-    header: Color::Rgb(0x89, 0xB4, 0xFA),
+    header: Color::Rgb(0xCD, 0xD6, 0xF4),
     selection_bg: Color::Rgb(0x31, 0x32, 0x44),
     selection_fg: Color::Rgb(0xCD, 0xD6, 0xF4),
     filter_bg: Color::Rgb(0x89, 0xB4, 0xFA),
@@ -236,7 +260,7 @@ pub const CATPPUCCIN: Theme = Theme {
 pub const ONE_DARK: Theme = Theme {
     name: "one-dark",
     border: Color::Rgb(0x4B, 0x52, 0x63),
-    header: Color::Rgb(0x61, 0xAF, 0xEF),
+    header: Color::Rgb(0xFF, 0xFF, 0xFF),
     selection_bg: Color::Rgb(0x3E, 0x44, 0x51),
     selection_fg: Color::Rgb(0xFF, 0xFF, 0xFF),
     filter_bg: Color::Rgb(0x61, 0xAF, 0xEF),
@@ -327,6 +351,27 @@ mod tests {
             for b in &THEMES[i + 1..] {
                 assert_ne!(a.name, b.name, "duplicate theme name: {}", a.name);
             }
+        }
+    }
+
+    /// True when two colors are the same concrete RGB/ANSI value.
+    fn colors_equal(a: Color, b: Color) -> bool {
+        a == b
+    }
+
+    #[test]
+    fn chrome_palette_has_contrast() {
+        for theme in THEMES {
+            assert!(
+                !colors_equal(theme.filter_fg, theme.filter_bg),
+                "theme '{}': filter_fg must differ from filter_bg",
+                theme.name
+            );
+            assert!(
+                !colors_equal(theme.selection_bg, theme.filter_bg),
+                "theme '{}': selection_bg must differ from filter_bg (chrome highlight)",
+                theme.name
+            );
         }
     }
 

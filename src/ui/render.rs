@@ -291,15 +291,14 @@ impl App {
             if i > 0 {
                 line_spans.push(Span::raw(" "));
             }
-            let style = if self.open_menu == Some(i) {
-                self.theme.selection_style()
-            } else {
-                self.theme.header_style()
-            };
-            line_spans.push(Span::styled(cell.clone(), style));
+            let open = self.open_menu == Some(i);
+            line_spans.push(Span::styled(
+                cell.clone(),
+                self.theme.chrome_button_style(open),
+            ));
         }
         f.render_widget(
-            Paragraph::new(Line::from(line_spans)).style(self.theme.filter_style()),
+            Paragraph::new(Line::from(line_spans)).style(self.theme.chrome_bar_style()),
             area,
         );
     }
@@ -329,14 +328,15 @@ impl App {
                 line_spans.push(Span::raw(" "));
             }
             let active = menu::TOOLBAR[i].action == Action::SetView(self.view_mode);
-            let style = if active {
-                self.theme.selection_style()
-            } else {
-                self.theme.accent_style()
-            };
-            line_spans.push(Span::styled(cell.clone(), style));
+            line_spans.push(Span::styled(
+                cell.clone(),
+                self.theme.chrome_button_style(active),
+            ));
         }
-        f.render_widget(Paragraph::new(Line::from(line_spans)), area);
+        f.render_widget(
+            Paragraph::new(Line::from(line_spans)).style(self.theme.chrome_bar_style()),
+            area,
+        );
     }
 
     pub(crate) fn render_dropdown(&mut self, f: &mut ratatui::Frame, screen: Rect) {
