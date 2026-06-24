@@ -6,6 +6,10 @@
 ![macOS 12+](https://img.shields.io/badge/macOS-12%2B-lightgrey)
 ![License: MIT](https://img.shields.io/badge/license-MIT-green)
 
+<p align="center">
+  <img src="demo.png" alt="filetree scanning a full disk — an interactive terminal disk-usage analyzer for macOS" width="900">
+</p>
+
 ## Why filetree?
 
 | | filetree | TreeSize | DaisyDisk |
