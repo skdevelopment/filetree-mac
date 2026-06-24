@@ -7,6 +7,9 @@ Agents: add entries under **[Unreleased]** for every change; move to a version s
 
 ## [Unreleased]
 
+### Changed
+- **README** — Install section clarifies `install.sh` as the only path (fast rustup/cargo build); documents `--theme`, `c` cancel, all 11 themes, FDA env var, and the `filetree`/`filetree-mac` wrapper for manual installs.
+
 ### Removed
 - **Homebrew formula** — dropped `Formula/filetree.rb` and all Homebrew install docs. Brew's `rust` dependency pulls in LLVM and Python and compiles far slower than `install.sh`, which uses rustup/cargo directly. `curl | bash` / `./install.sh` remains the canonical install path.
 

@@ -24,9 +24,11 @@
 
 Point it at a folder (or your whole disk) and it shows a TreeSize-style sortable tree of folder sizes, a DaisyDisk-style breakdown of what's largest, and lets you reveal or delete the offenders — all without leaving the terminal.
 
-## One-line install (any Mac)
+## Install
 
-Paste this in Terminal:
+Install is **`install.sh` only** — it uses rustup/cargo directly for a fast release build. No Homebrew (Brew's `rust` formula pulls LLVM and Python and compiles much slower).
+
+### One-line install (any Mac)
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/skdevelopment/filetree-mac/main/install.sh | bash
@@ -35,7 +37,7 @@ curl -fsSL https://raw.githubusercontent.com/skdevelopment/filetree-mac/main/ins
 The script will:
 
 - Install Rust via rustup if needed (one-time)
-- Build and install `filetree` into `~/.local/bin`
+- Run `cargo build --release` and install into `~/.local/bin`
 - Add `~/.local/bin` to your PATH
 
 Open a **new terminal tab** (or run `source ~/.zshrc`), then:
@@ -57,24 +59,36 @@ filetree
 | `FILETREE_MODIFY_PATH` | `1` | Add `~/.local/bin` to shell config |
 | `FILETREE_AUTO_INSTALL_RUST` | `1` | Install Rust via rustup if `cargo` is missing |
 | `FILETREE_GIT_REF` | `main` | Git branch or tag to install |
+| `FILETREE_OPEN_FDA` | `""` | After install: ask to open FDA settings (`1` = open, `0` = print only) |
 
 ### Manual install
 
 ```bash
 cargo build --release
+mkdir -p ~/.local/bin
 cp target/release/filetree-mac ~/.local/bin/
-# Optional: shell wrapper so `filetree` works (see install.sh)
-filetree-mac ~
+cat > ~/.local/bin/filetree << 'EOF'
+#!/usr/bin/env sh
+exec "$(dirname "$0")/filetree-mac" "$@"
+EOF
+chmod +x ~/.local/bin/filetree ~/.local/bin/filetree-mac
+export PATH="$HOME/.local/bin:$PATH"
+filetree ~
 ```
+
+The `filetree` command is a shell wrapper around `filetree-mac` (macOS blocks a Mach-O binary named exactly `filetree`).
 
 ## Quick start
 
 ```bash
-filetree              # scan whole system disk (/) on macOS
-filetree ~            # scan home directory
-filetree ~/Downloads  # scan specific path
+filetree                    # scan whole system disk (/) on macOS
+filetree ~                  # scan home directory
+filetree ~/Downloads        # scan a specific path
+filetree --theme nord ~     # pick a color theme at launch
 filetree --version
 ```
+
+**Themes:** `classic`, `nord`, `gruvbox`, `solarized`, `dracula`, `tokyo-night`, `catppuccin`, `one-dark`, `monokai`, `light`, `monochrome` — or press `t` in the TUI to preview and apply.
 
 ## Features
 
@@ -143,6 +157,7 @@ filetree ~/Library/CloudStorage/GoogleDrive-you@example.com
 |-----|--------|
 | `r` | Refresh/rescan selected folder |
 | `R` | Rescan entire tree |
+| `c` | Cancel active scan or delete |
 | `/` | Filter by name |
 | `Esc` | Clear filter / close menu |
 | `s` | Cycle sort column |
@@ -168,10 +183,12 @@ filetree ~/Library/CloudStorage/GoogleDrive-you@example.com
 
 ```bash
 ./install.sh              # or: cargo build --release
-cargo test                # Rust integration + unit tests
+cargo test                # integration + unit tests
 cargo fmt && cargo clippy -- -D warnings
 filetree ~                # run TUI
 ```
+
+Contributor docs: [`docs/`](docs/) (architecture, modules, security, changelog).
 
 ## Project structure
 
