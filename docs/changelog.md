@@ -7,6 +7,10 @@ Agents: add entries under **[Unreleased]** for every change; move to a version s
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-24
+
+First public release — a free, open-source alternative to TreeSize and DaisyDisk for macOS.
+
 ### Fixed
 - **The directory-tree file list reappears (Name column no longer collapses).** The tree table's `Name` column was a `Constraint::Percentage`, which ratatui's layout solver squeezes to **zero width** once the fixed-width metadata columns (`Size`, `Alloc`, `%Par`, …) already fill a narrow pane — so the table showed a column of sizes with no file or folder names at all. The columns are now **width-adaptive**: `Name` always takes the leftover space via `Constraint::Fill` after reserving a generous proportional minimum (≥30% of the pane, ≥24 cols), and the secondary columns are added in priority order only while they actually fit. The tree/chart split also shifted from 58/42 to 64/36 so the file list (the primary surface) gets more room. The file list now renders correctly at any terminal width.
 - **Full-disk (`/`) scans no longer hang or crash the system.** Two distinct causes:
