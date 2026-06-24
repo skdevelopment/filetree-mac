@@ -24,7 +24,23 @@
 
 Point it at a folder (or your whole disk) and it shows a TreeSize-style sortable tree of folder sizes, a DaisyDisk-style breakdown of what's largest, and lets you reveal or delete the offenders — all without leaving the terminal.
 
-## One-line install (any Mac)
+## Install
+
+### Homebrew (recommended if you use brew)
+
+```bash
+brew install skdevelopment/filetree-mac/filetree
+```
+
+Homebrew builds from the tagged release (requires the `rust` formula at build time). Upgrades: `brew upgrade filetree`.
+
+To install the latest `main` branch instead:
+
+```bash
+brew install --HEAD skdevelopment/filetree-mac/filetree
+```
+
+### One-line install (any Mac)
 
 Paste this in Terminal:
 
@@ -32,7 +48,7 @@ Paste this in Terminal:
 curl -fsSL https://raw.githubusercontent.com/skdevelopment/filetree-mac/main/install.sh | bash
 ```
 
-That's it. The script will:
+The script will:
 
 - Install Rust via rustup if needed (one-time)
 - Build and install `filetree` into `~/.local/bin`
@@ -177,6 +193,7 @@ filetree ~                # run TUI
 
 ```
 filetree-mac/
+├── Formula/filetree.rb   # Homebrew (brew install skdevelopment/filetree-mac/filetree)
 ├── install.sh
 ├── Cargo.toml
 ├── README.md
@@ -194,7 +211,7 @@ filetree-mac/
 ## Requirements
 
 - macOS 12+ (Intel or Apple Silicon)
-- Rust 1.75+ (installed automatically by `install.sh` if needed)
+- Rust 1.75+ (`install.sh` installs via rustup if needed; Homebrew pulls in `rust` as a build dependency)
 - Terminal with UTF-8 support (for tree/box drawing characters)
 
 ## License

@@ -70,7 +70,31 @@ cargo build --release
 ./install.sh    # installs ~/.local/bin/filetree-mac and symlinks filetree → filetree-mac
 ```
 
-Version: `Cargo.toml` (`0.2.0`).
+Version: `Cargo.toml` (currently `0.3.0`).
+
+### Homebrew
+
+The formula lives in [`Formula/filetree.rb`](../Formula/filetree.rb) in this repository (same-repo tap):
+
+```bash
+brew install skdevelopment/filetree-mac/filetree
+brew install --HEAD skdevelopment/filetree-mac/filetree   # track main
+```
+
+Users need Homebrew; the formula depends on `:macos` and `rust` (build only). It installs `filetree-mac` plus a `filetree` shell wrapper — same Mach-O naming workaround as `install.sh`.
+
+#### Release checklist (maintainers)
+
+When cutting a new version:
+
+1. Bump `version` in `Cargo.toml` and run `cargo test`.
+2. Commit, tag (`git tag vX.Y.Z`), and push the tag.
+3. Update `Formula/filetree.rb`:
+   - `url` → `https://github.com/skdevelopment/filetree-mac/archive/refs/tags/vX.Y.Z.tar.gz`
+   - `sha256` → `curl -fsSL <url> | shasum -a 256`
+4. Commit the formula bump on `main`.
+
+Optional later: GitHub Actions release artifacts + pre-built bottles for faster installs without compiling Rust on the user's machine. Submitting to [homebrew-core](https://github.com/Homebrew/homebrew-core) is a separate, longer review process.
 
 ## Installer (`install.sh`)
 

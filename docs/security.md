@@ -44,7 +44,14 @@ filetree is a **local, single-user** tool with no network service. Risk is conce
 - Optional **redacted** export for sharing
 - Export rows filtered to scan root; sensitive-path banner when FDA areas were scanned
 
-## Install script (`install.sh`)
+## Install (`install.sh` and Homebrew)
+
+| Channel | Notes |
+|---------|--------|
+| `install.sh` | Remote `curl \| bash` or local clone; see controls below |
+| Homebrew | `brew install skdevelopment/filetree-mac/filetree` — builds from a tagged GitHub tarball (`Formula/filetree.rb`); no remote pipe, but still compiles locally via `cargo` |
+
+### Install script (`install.sh`)
 
 | Control | Purpose |
 |---------|---------|

@@ -83,6 +83,7 @@ filetree-mac/
 ├── agent.md              ← you are here
 ├── README.md             ← user install & quick start
 ├── Cargo.toml            ← Rust crate (canonical)
+├── Formula/filetree.rb   ← Homebrew formula (same-repo tap)
 ├── install.sh            ← one-command installer (cargo build --release)
 ├── checksums.txt         ← SHA256 of install.sh
 ├── docs/                 ← agent & contributor reference
