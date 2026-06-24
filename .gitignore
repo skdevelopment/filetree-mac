@@ -1,0 +1,16 @@
+# Rust build output
+/target
+
+# Legacy Swift prototype build artifact (compiled .app)
+/build
+
+# Test / scratch output
+/test_output
+
+# Local AI-agent tooling & session config (not part of the project)
+/.claude
+/.agents
+/skills-lock.json
+
+# macOS
+.DS_Store
