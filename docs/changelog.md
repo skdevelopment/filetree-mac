@@ -7,8 +7,11 @@ Agents: add entries under **[Unreleased]** for every change; move to a version s
 
 ## [Unreleased]
 
+### Fixed
+- **Homebrew install docs** — `brew install skdevelopment/filetree-mac/filetree` alone fails (Homebrew expects a `homebrew-filetree-mac` tap repo). Document the working flow: `brew tap skdevelopment/filetree-mac https://github.com/skdevelopment/filetree-mac.git`, then `brew install filetree`.
+
 ### Added
-- **Homebrew install** — `Formula/filetree.rb` in this repo; `brew install skdevelopment/filetree-mac/filetree` builds the release and installs `filetree` + `filetree-mac` (same Mach-O naming workaround as `install.sh`). Documented in README and [development.md](development.md).
+- **Homebrew install** — `Formula/filetree.rb` in this repo; tap + `brew install filetree` builds the release and installs `filetree` + `filetree-mac` (same Mach-O naming workaround as `install.sh`). Documented in README and [development.md](development.md).
 
 ## [0.3.0] - 2026-06-24
 

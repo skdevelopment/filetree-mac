@@ -28,16 +28,20 @@ Point it at a folder (or your whole disk) and it shows a TreeSize-style sortable
 
 ### Homebrew (recommended if you use brew)
 
+The formula lives in this repo under `Formula/`. Tap the repository explicitly (Homebrew looks for `homebrew-filetree-mac` by default, not `filetree-mac`):
+
 ```bash
-brew install skdevelopment/filetree-mac/filetree
+brew tap skdevelopment/filetree-mac https://github.com/skdevelopment/filetree-mac.git
+brew trust skdevelopment/filetree-mac    # first install only (Homebrew 6+)
+brew install filetree
 ```
 
-Homebrew builds from the tagged release (requires the `rust` formula at build time). Upgrades: `brew upgrade filetree`.
+Homebrew builds from the tagged release (pulls in the `rust` formula as a build dependency). Upgrades: `brew upgrade filetree`.
 
-To install the latest `main` branch instead:
+Latest `main` branch:
 
 ```bash
-brew install --HEAD skdevelopment/filetree-mac/filetree
+brew install --HEAD filetree
 ```
 
 ### One-line install (any Mac)

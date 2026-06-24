@@ -74,11 +74,13 @@ Version: `Cargo.toml` (currently `0.3.0`).
 
 ### Homebrew
 
-The formula lives in [`Formula/filetree.rb`](../Formula/filetree.rb) in this repository (same-repo tap):
+The formula lives in [`Formula/filetree.rb`](../Formula/filetree.rb) in this repository. Tap the GitHub repo explicitly — `brew install skdevelopment/filetree-mac/filetree` alone looks for a separate `homebrew-filetree-mac` repository and fails:
 
 ```bash
-brew install skdevelopment/filetree-mac/filetree
-brew install --HEAD skdevelopment/filetree-mac/filetree   # track main
+brew tap skdevelopment/filetree-mac https://github.com/skdevelopment/filetree-mac.git
+brew trust skdevelopment/filetree-mac    # first install only (Homebrew 6+)
+brew install filetree
+brew install --HEAD filetree             # track main
 ```
 
 Users need Homebrew; the formula depends on `:macos` and `rust` (build only). It installs `filetree-mac` plus a `filetree` shell wrapper — same Mach-O naming workaround as `install.sh`.

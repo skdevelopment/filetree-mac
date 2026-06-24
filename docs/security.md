@@ -49,7 +49,7 @@ filetree is a **local, single-user** tool with no network service. Risk is conce
 | Channel | Notes |
 |---------|--------|
 | `install.sh` | Remote `curl \| bash` or local clone; see controls below |
-| Homebrew | `brew install skdevelopment/filetree-mac/filetree` — builds from a tagged GitHub tarball (`Formula/filetree.rb`); no remote pipe, but still compiles locally via `cargo` |
+| Homebrew | Tap `https://github.com/skdevelopment/filetree-mac.git`, then `brew install filetree` — builds from a tagged GitHub tarball (`Formula/filetree.rb`); no remote pipe, but still compiles locally via `cargo` |
 
 ### Install script (`install.sh`)
 
