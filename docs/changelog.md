@@ -7,6 +7,8 @@ Agents: add entries under **[Unreleased]** for every change; move to a version s
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-24
+
 ### Changed
 - **Refactored `src/app.rs` into smaller modules.** The ~3000-line monolith is now split into `session.rs` (`ActiveJob` unifying scan and delete workers), `ui/modal.rs`, `ui/views.rs`, `ui/render.rs`, and `ui/input.rs`. `App` uses `Option<Modal>` (no `Modal::None`) and `active_job: Option<ActiveJob>` instead of separate scan/delete fields. `ViewMode` moved to `menu.rs`; `Action::CancelScan` renamed to `Action::Cancel`. Path helpers `dirs_home` / `expand_user_path` consolidated in `paths.rs`.
 

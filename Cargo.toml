@@ -1,6 +1,6 @@
 [package]
 name = "filetree"
-version = "0.2.0"
+version = "0.3.0"
 edition = "2021"
 description = "TreeSize-style disk usage analyzer for macOS"
 license = "MIT"
