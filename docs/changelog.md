@@ -7,11 +7,8 @@ Agents: add entries under **[Unreleased]** for every change; move to a version s
 
 ## [Unreleased]
 
-### Fixed
-- **Homebrew install docs** — `brew install skdevelopment/filetree-mac/filetree` alone fails (Homebrew expects a `homebrew-filetree-mac` tap repo). Document the working flow: `brew tap skdevelopment/filetree-mac https://github.com/skdevelopment/filetree-mac.git`, then `brew install filetree`.
-
-### Added
-- **Homebrew install** — `Formula/filetree.rb` in this repo; tap + `brew install filetree` builds the release and installs `filetree` + `filetree-mac` (same Mach-O naming workaround as `install.sh`). Documented in README and [development.md](development.md).
+### Removed
+- **Homebrew formula** — dropped `Formula/filetree.rb` and all Homebrew install docs. Brew's `rust` dependency pulls in LLVM and Python and compiles far slower than `install.sh`, which uses rustup/cargo directly. `curl | bash` / `./install.sh` remains the canonical install path.
 
 ## [0.3.0] - 2026-06-24
 
