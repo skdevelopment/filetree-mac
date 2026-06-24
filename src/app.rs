@@ -371,11 +371,7 @@ impl App {
             cancel: cancel.clone(),
             cancel_requested: false,
             started_at: Instant::now(),
-            volume_total_bytes: if use_volume {
-                volume_total_bytes
-            } else {
-                None
-            },
+            volume_total_bytes: if use_volume { volume_total_bytes } else { None },
         });
 
         let follow_symlinks = self.follow_symlinks;
@@ -552,9 +548,7 @@ impl App {
             if cancel_requested && !self.progress_display.worker_cancelled {
                 return;
             }
-            self.status_message = self
-                .progress_display
-                .status_line(cancel_requested);
+            self.status_message = self.progress_display.status_line(cancel_requested);
         }
     }
 

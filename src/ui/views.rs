@@ -4,8 +4,7 @@ use crate::menu::ViewMode;
 use crate::models::{ScanNode, SortKey, VolumeInfo};
 use crate::scan_cache::fill_node_metadata;
 use crate::scanner::{
-    collect_extension_stats, collect_largest_files, format_bytes, labeled_pie_legend,
-    list_volumes,
+    collect_extension_stats, collect_largest_files, format_bytes, labeled_pie_legend, list_volumes,
 };
 use std::collections::HashSet;
 use std::path::PathBuf;

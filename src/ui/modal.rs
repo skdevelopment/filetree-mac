@@ -1,7 +1,5 @@
 use crate::app::App;
-use crate::app_logic::{
-    confirm_dialog_executes, export_modal_selection, typed_confirm_executes,
-};
+use crate::app_logic::{confirm_dialog_executes, export_modal_selection, typed_confirm_executes};
 use crate::delete::{run_delete, DeleteProgress};
 use crate::export::{is_sensitive_export_path, save_report};
 use crate::paths::{expand_user_path, safe_delete_target};
@@ -124,220 +122,202 @@ impl App {
                     self.modal = None;
                 }
             }
-            Modal::Confirm { .. } => {
-                match key.code {
-                    KeyCode::Left | KeyCode::Char('h') => {
-                        if let Modal::Confirm { selected, .. } = modal {
-                            *selected = 0;
-                        }
+            Modal::Confirm { .. } => match key.code {
+                KeyCode::Left | KeyCode::Char('h') => {
+                    if let Modal::Confirm { selected, .. } = modal {
+                        *selected = 0;
                     }
-                    KeyCode::Right | KeyCode::Char('l') => {
-                        if let Modal::Confirm { selected, .. } = modal {
-                            *selected = 1;
-                        }
+                }
+                KeyCode::Right | KeyCode::Char('l') => {
+                    if let Modal::Confirm { selected, .. } = modal {
+                        *selected = 1;
                     }
-                    KeyCode::Enter => {
-                        let selected = if let Modal::Confirm { selected, .. } = modal {
-                            *selected
-                        } else {
-                            1
-                        };
+                }
+                KeyCode::Enter => {
+                    let selected = if let Modal::Confirm { selected, .. } = modal {
+                        *selected
+                    } else {
+                        1
+                    };
+                    self.modal = None;
+                    if confirm_dialog_executes(selected) {
+                        self.execute_pending_action();
+                    } else {
+                        self.pending_action = None;
+                    }
+                }
+                KeyCode::Esc => {
+                    self.modal = None;
+                    self.pending_action = None;
+                }
+                _ => {}
+            },
+            Modal::TypedConfirm { .. } => match key.code {
+                KeyCode::Left => {
+                    if let Modal::TypedConfirm { selected, .. } = modal {
+                        *selected = 0;
+                    }
+                }
+                KeyCode::Right => {
+                    if let Modal::TypedConfirm { selected, .. } = modal {
+                        *selected = 1;
+                    }
+                }
+                KeyCode::Enter => {
+                    let (confirm_text, input_val, selected) = if let Modal::TypedConfirm {
+                        confirm_text,
+                        input,
+                        selected,
+                        ..
+                    } = modal
+                    {
+                        (confirm_text.clone(), input.clone(), *selected)
+                    } else {
+                        return true;
+                    };
+                    if typed_confirm_executes(selected, &input_val, &confirm_text) {
                         self.modal = None;
-                        if confirm_dialog_executes(selected) {
-                            self.execute_pending_action();
-                        } else {
-                            self.pending_action = None;
-                        }
-                    }
-                    KeyCode::Esc => {
+                        self.execute_pending_action();
+                    } else if selected == 1 {
                         self.modal = None;
                         self.pending_action = None;
                     }
-                    _ => {}
                 }
-            }
-            Modal::TypedConfirm { .. } => {
-                match key.code {
-                    KeyCode::Left => {
-                        if let Modal::TypedConfirm { selected, .. } = modal {
-                            *selected = 0;
-                        }
-                    }
-                    KeyCode::Right => {
-                        if let Modal::TypedConfirm { selected, .. } = modal {
-                            *selected = 1;
-                        }
-                    }
-                    KeyCode::Enter => {
-                        let (confirm_text, input_val, selected) =
-                            if let Modal::TypedConfirm {
-                                confirm_text,
-                                input,
-                                selected,
-                                ..
-                            } = modal
-                            {
-                                (confirm_text.clone(), input.clone(), *selected)
-                            } else {
-                                return true;
-                            };
-                        if typed_confirm_executes(selected, &input_val, &confirm_text) {
-                            self.modal = None;
-                            self.execute_pending_action();
-                        } else if selected == 1 {
-                            self.modal = None;
-                            self.pending_action = None;
-                        }
-                    }
-                    KeyCode::Esc => {
-                        self.modal = None;
-                        self.pending_action = None;
-                    }
-                    KeyCode::Backspace => {
-                        if let Modal::TypedConfirm { input, .. } = modal {
-                            input.pop();
-                        }
-                    }
-                    KeyCode::Char(c) => {
-                        if let Modal::TypedConfirm { input, .. } = modal {
-                            input.push(c);
-                        }
-                    }
-                    _ => {}
+                KeyCode::Esc => {
+                    self.modal = None;
+                    self.pending_action = None;
                 }
-            }
-            Modal::PathInput { .. } => {
-                match key.code {
-                    KeyCode::Enter => {
-                        let (purpose, val) = if let Modal::PathInput {
-                            input,
-                            purpose,
-                            ..
-                        } = modal
-                        {
-                            (*purpose, input.clone())
-                        } else {
-                            return true;
-                        };
-                        self.modal = None;
-                        match purpose {
-                            PathInputPurpose::Goto if !val.is_empty() => {
-                                self.start_scan(PathBuf::from(val));
-                            }
-                            PathInputPurpose::Filter => {
-                                self.filter_text = val;
-                                self.show_filter_bar = !self.filter_text.is_empty();
-                                self.recompute_filter_matches();
-                                self.rebuild_view();
-                            }
-                            _ => {}
-                        }
+                KeyCode::Backspace => {
+                    if let Modal::TypedConfirm { input, .. } = modal {
+                        input.pop();
                     }
-                    KeyCode::Esc => self.modal = None,
-                    KeyCode::Backspace => {
-                        if let Modal::PathInput { input, .. } = modal {
-                            input.pop();
-                        }
-                    }
-                    KeyCode::Char(c) => {
-                        if let Modal::PathInput { input, .. } = modal {
-                            input.push(c);
-                        }
-                    }
-                    _ => {}
                 }
-            }
-            Modal::Export { .. } => {
-                match key.code {
-                    KeyCode::Left => {
-                        if let Modal::Export { selected, .. } = modal {
-                            *selected = selected.saturating_sub(1);
-                        }
+                KeyCode::Char(c) => {
+                    if let Modal::TypedConfirm { input, .. } = modal {
+                        input.push(c);
                     }
-                    KeyCode::Right => {
-                        if let Modal::Export { selected, .. } = modal {
-                            *selected = (*selected + 1).min(3);
-                        }
-                    }
-                    KeyCode::Enter => {
-                        let (path, sel) = if let Modal::Export {
-                            path_input,
-                            selected,
-                        } = modal
-                        {
-                            (path_input.clone(), *selected)
-                        } else {
-                            return true;
-                        };
-                        let path = expand_user_path(Path::new(&path));
-                        self.modal = None;
-                        if let Some((fmt, redact)) = export_modal_selection(sel) {
-                            self.pending_action = Some(PendingAction::Export {
-                                fmt: fmt.to_string(),
-                                path,
-                                redact,
-                                overwrite: false,
-                            });
-                            self.execute_pending_action();
-                        }
-                    }
-                    KeyCode::Esc => self.modal = None,
-                    KeyCode::Backspace => {
-                        if let Modal::Export { path_input, .. } = modal {
-                            path_input.pop();
-                        }
-                    }
-                    KeyCode::Char(c) => {
-                        if let Modal::Export { path_input, .. } = modal {
-                            path_input.push(c);
-                        }
-                    }
-                    _ => {}
                 }
-            }
-            Modal::ScanErrors { .. } => {
-                match key.code {
-                    KeyCode::Enter | KeyCode::Esc => self.modal = None,
-                    KeyCode::Down | KeyCode::Char('j') => {
-                        if let Modal::ScanErrors { scroll, .. } = modal {
-                            *scroll += 1;
+                _ => {}
+            },
+            Modal::PathInput { .. } => match key.code {
+                KeyCode::Enter => {
+                    let (purpose, val) = if let Modal::PathInput { input, purpose, .. } = modal {
+                        (*purpose, input.clone())
+                    } else {
+                        return true;
+                    };
+                    self.modal = None;
+                    match purpose {
+                        PathInputPurpose::Goto if !val.is_empty() => {
+                            self.start_scan(PathBuf::from(val));
                         }
-                    }
-                    KeyCode::Up | KeyCode::Char('k') => {
-                        if let Modal::ScanErrors { scroll, .. } = modal {
-                            *scroll = scroll.saturating_sub(1);
+                        PathInputPurpose::Filter => {
+                            self.filter_text = val;
+                            self.show_filter_bar = !self.filter_text.is_empty();
+                            self.recompute_filter_matches();
+                            self.rebuild_view();
                         }
+                        _ => {}
                     }
-                    _ => {}
                 }
-            }
-            Modal::ThemePicker { .. } => {
-                match key.code {
-                    KeyCode::Up | KeyCode::Char('k') => {
-                        if let Modal::ThemePicker { selected, .. } = modal {
-                            *selected = selected.saturating_sub(1);
-                            self.theme = crate::theme::THEMES[*selected];
-                        }
+                KeyCode::Esc => self.modal = None,
+                KeyCode::Backspace => {
+                    if let Modal::PathInput { input, .. } = modal {
+                        input.pop();
                     }
-                    KeyCode::Down | KeyCode::Char('j') => {
-                        if let Modal::ThemePicker { selected, .. } = modal {
-                            let len = crate::theme::THEMES.len();
-                            *selected = (*selected + 1).min(len.saturating_sub(1));
-                            self.theme = crate::theme::THEMES[*selected];
-                        }
-                    }
-                    KeyCode::Enter => {
-                        self.modal = None;
-                    }
-                    KeyCode::Esc => {
-                        if let Modal::ThemePicker { original, .. } = modal {
-                            self.theme = *original;
-                        }
-                        self.modal = None;
-                    }
-                    _ => {}
                 }
-            }
+                KeyCode::Char(c) => {
+                    if let Modal::PathInput { input, .. } = modal {
+                        input.push(c);
+                    }
+                }
+                _ => {}
+            },
+            Modal::Export { .. } => match key.code {
+                KeyCode::Left => {
+                    if let Modal::Export { selected, .. } = modal {
+                        *selected = selected.saturating_sub(1);
+                    }
+                }
+                KeyCode::Right => {
+                    if let Modal::Export { selected, .. } = modal {
+                        *selected = (*selected + 1).min(3);
+                    }
+                }
+                KeyCode::Enter => {
+                    let (path, sel) = if let Modal::Export {
+                        path_input,
+                        selected,
+                    } = modal
+                    {
+                        (path_input.clone(), *selected)
+                    } else {
+                        return true;
+                    };
+                    let path = expand_user_path(Path::new(&path));
+                    self.modal = None;
+                    if let Some((fmt, redact)) = export_modal_selection(sel) {
+                        self.pending_action = Some(PendingAction::Export {
+                            fmt: fmt.to_string(),
+                            path,
+                            redact,
+                            overwrite: false,
+                        });
+                        self.execute_pending_action();
+                    }
+                }
+                KeyCode::Esc => self.modal = None,
+                KeyCode::Backspace => {
+                    if let Modal::Export { path_input, .. } = modal {
+                        path_input.pop();
+                    }
+                }
+                KeyCode::Char(c) => {
+                    if let Modal::Export { path_input, .. } = modal {
+                        path_input.push(c);
+                    }
+                }
+                _ => {}
+            },
+            Modal::ScanErrors { .. } => match key.code {
+                KeyCode::Enter | KeyCode::Esc => self.modal = None,
+                KeyCode::Down | KeyCode::Char('j') => {
+                    if let Modal::ScanErrors { scroll, .. } = modal {
+                        *scroll += 1;
+                    }
+                }
+                KeyCode::Up | KeyCode::Char('k') => {
+                    if let Modal::ScanErrors { scroll, .. } = modal {
+                        *scroll = scroll.saturating_sub(1);
+                    }
+                }
+                _ => {}
+            },
+            Modal::ThemePicker { .. } => match key.code {
+                KeyCode::Up | KeyCode::Char('k') => {
+                    if let Modal::ThemePicker { selected, .. } = modal {
+                        *selected = selected.saturating_sub(1);
+                        self.theme = crate::theme::THEMES[*selected];
+                    }
+                }
+                KeyCode::Down | KeyCode::Char('j') => {
+                    if let Modal::ThemePicker { selected, .. } = modal {
+                        let len = crate::theme::THEMES.len();
+                        *selected = (*selected + 1).min(len.saturating_sub(1));
+                        self.theme = crate::theme::THEMES[*selected];
+                    }
+                }
+                KeyCode::Enter => {
+                    self.modal = None;
+                }
+                KeyCode::Esc => {
+                    if let Modal::ThemePicker { original, .. } = modal {
+                        self.theme = *original;
+                    }
+                    self.modal = None;
+                }
+                _ => {}
+            },
         }
         true
     }

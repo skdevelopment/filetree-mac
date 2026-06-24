@@ -1,9 +1,9 @@
 use crate::app::App;
+use crate::app::LARGE_DELETE_BYTES;
 use crate::fda::open_fda_settings;
 use crate::menu::{self, Action};
 use crate::paths::is_delete_protected;
 use crate::scanner::format_bytes;
-use crate::app::LARGE_DELETE_BYTES;
 use crate::ui::modal::{Modal, PendingAction};
 use crate::ui::render::{hit_action, hit_index, rect_contains};
 use crossterm::event::{
